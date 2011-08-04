@@ -7,15 +7,15 @@ Gems series. I wrote the following articles, both of which were included in
 * Lock\-Free Algorithms, first included in
 [Game Programming Gems 6](http://amzn.to/noFiJx) \(2006\).
 
-The project file for the Zobrist Hash is for Visual Studio 2003. The project
-file for the Lock Free code is for Visual Studio 2005. Both projects will
-build under GCC and Visual C++ 2010 as well. I've left the code as it was
-originally written, though the code does differ in style to my other code on
-GitHub.
+This code is targetted toward Visual C++ 2010, though it should also work with
+GCC. The master branch serves as the up-to-date version of this code. The
+gems_bugfix branch contains the code and projects as they were written for the
+Gems books, with minor bug fixes as necessary.
 
 The Mersenne Twister code was written in a tutorial style, and is _not_
-optimized for speed. It is likely that there are faster implementations
-available.
+optimized for speed. C++03 was the latest version of C++ available when this
+code was originally written.  C++0x now includes the Mersenne Twister as one
+of several new random number libraries available by default.
 
 The Lock\-Free code is reasonably good, though I caution any user against
 using any lock\-free algorithms, as that style of code is _exceptionally_
