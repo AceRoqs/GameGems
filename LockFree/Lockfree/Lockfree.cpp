@@ -1,7 +1,7 @@
 //
 // Game Programming Gems 6
 // Lock free multithreaded algorithms
-// By Toby Jones (thjones@microsoft.com)
+// By Toby Jones
 // Supports Microsoft Visual C++ and GCC.
 //
 

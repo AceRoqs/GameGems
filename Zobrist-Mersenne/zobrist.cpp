@@ -1,6 +1,6 @@
 // Demonstration code for Zobrist Hash using the Mersenne Twister
 // Compiles under Visual Studio .NET 2003 under Windows and gcc under Linux.
-// By Toby Jones (tjones@humanhead.com)
+// By Toby Jones
 
 #include <iostream>
 #include <cassert>

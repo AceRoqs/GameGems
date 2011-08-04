@@ -1,6 +1,6 @@
 Game Programming Gems 6
 Lock free multithreaded algorithms
-By Toby Jones (thjones@microsoft.com)
+By Toby Jones
 
 The included code (lockfree.cpp) supports both Microsoft Visual C++ and GCC for Windows, but with a bit of tweaking, could support other systems.  The primary area of interest when porting would be the implementation of the CAS and CAS2 code, which tends to be system specific.  Additionally, the code assumes a pointer size of 32-bits, and porting to a 64-bit architecture will require workarounds noted in the associated article.
 
