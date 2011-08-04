@@ -119,14 +119,14 @@ uint32_t MersenneTwister::Rand()
         Regenerate();
     }
 
-    uint32_t y;
-    y = s_aMT[m_ix++];
-    y ^= y >> MT_U;
-    y ^= y << MT_S & MT_B;
-    y ^= y << MT_T & MT_C;
-    y ^= y >> MT_L;
+    uint32_t num;
+    num = s_aMT[m_ix++];
+    num ^= num >> MT_U;
+    num ^= num << MT_S & MT_B;
+    num ^= num << MT_T & MT_C;
+    num ^= num >> MT_L;
 
-    return y;
+    return num;
 }
 
 uint64_t MersenneTwister::Rand64()
