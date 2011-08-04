@@ -194,9 +194,9 @@ static const int NUM_COLORS = 2;        // white, black
 // incrementally update the key).
 static const uint64_t BLACK_TO_MOVE = 0x8913125CFB309AFC;   // Random number to XOR into black moves
 
-enum eChessPiece { EMPTY,
-                   B_ROOK, B_KNIGHT, B_BISHOP, B_KING, B_QUEEN, B_PAWN,
-                   W_ROOK, W_KNIGHT, W_BISHOP, W_KING, W_QUEEN, W_PAWN };
+enum eChessPiece { B_ROOK, B_KNIGHT, B_BISHOP, B_KING, B_QUEEN, B_PAWN,
+                   W_ROOK, W_KNIGHT, W_BISHOP, W_KING, W_QUEEN, W_PAWN
+                   EMPTY };
 enum eColor { BLACK, WHITE };
 
 class ChessBoard
@@ -271,7 +271,7 @@ void ChessBoard::PopulateChessBoard()
 
     for(ii = 0; ii < BOARD_SIZE; ii++)
     {
-        assert(m_aBoard[ii] >= EMPTY && m_aBoard[ii] <= W_PAWN);
+        assert(m_aBoard[ii] >= B_ROOK && m_aBoard[ii] <= EMPTY);
     }
 }
 
