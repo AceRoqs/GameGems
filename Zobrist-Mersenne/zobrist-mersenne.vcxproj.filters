@@ -18,9 +18,15 @@
     <ClCompile Include="zobrist-mersenne.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mersenne.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pow2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mersenne.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
