@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="zobrist-mersenne.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="mersenne.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zobrist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

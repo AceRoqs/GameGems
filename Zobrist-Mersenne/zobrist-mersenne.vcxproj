@@ -151,7 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="mersenne.cpp" />
-    <ClCompile Include="zobrist-mersenne.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="zobrist.cpp" />
   </ItemGroup>
   <ItemGroup>

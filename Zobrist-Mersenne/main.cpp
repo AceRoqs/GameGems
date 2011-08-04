@@ -2,7 +2,6 @@
 // Compiles under Visual Studio 2010 under Windows and gcc under Linux.
 // By Toby Jones
 
-#include <cassert>
 #include <cstdint>
 #include <iostream>
 #include "mersenne.h"
