@@ -26,24 +26,18 @@ static void TestZH()
     ChessBoard chessBoard;
 
     uint64_t initialZobristKey = chessBoard.CalculateZobristKey(WHITE);
+    std::cout << "Initial Zobrist Key: " << initialZobristKey << std::endl;
 
+    std::cout << "Moving white pawn from a2 to a4..." << std::endl;
     uint64_t newIncrementalZobristKey = chessBoard.UpdateZobristKey(initialZobristKey,
                                                                     W_PAWN,
                                                                     8,
                                                                     24);
+    std::cout << "New Zobrist Key (incremental): " << newIncrementalZobristKey << std::endl;
 
     chessBoard.MovePiece(8, 24);
     uint64_t newFullZobristKey = chessBoard.CalculateZobristKey(BLACK);
-
-    std::cout << "Initial Zobrist Key: ";
-    std::cout << initialZobristKey << std::endl;
-
-    std::cout << "Moving white pawn from a2 to a4..." << std::endl;
-
-    std::cout << "New Zobrist Key (incremental): ";
-    std::cout << newIncrementalZobristKey << std::endl;
-    std::cout << "New Zobrist Key (full):        ";
-    std::cout << newFullZobristKey << std::endl;
+    std::cout << "New Zobrist Key (full):        " << newFullZobristKey << std::endl;
 
     if(newIncrementalZobristKey == newFullZobristKey)
     {

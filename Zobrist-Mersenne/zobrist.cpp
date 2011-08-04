@@ -76,6 +76,16 @@ ChessBoard::ChessBoard()
     PopulateChessBoard();
 }
 
+eColor GetPieceColor(eChessPiece piece)
+{
+    return piece < W_ROOK ? BLACK : WHITE;
+}
+
+eChessPiece GetUncoloredPiece(eChessPiece piece)
+{
+    return piece < W_ROOK ? piece : eChessPiece(piece - NUM_PIECES);
+}
+
 uint64_t ChessBoard::CalculateZobristKey(
     eColor sideToMove) const
 {
@@ -88,20 +98,8 @@ uint64_t ChessBoard::CalculateZobristKey(
     {
         if(EMPTY != m_aBoard[ii])
         {
-            if(W_ROOK <= m_aBoard[ii])
-            {
-                color = WHITE;
-            }
-            else
-            {
-                color = BLACK;
-            }
-
-            piece = eChessPiece(m_aBoard[ii]);
-            if(WHITE == color)
-            {
-                piece = eChessPiece(piece - NUM_PIECES);
-            }
+            color = GetPieceColor(m_aBoard[ii]);
+            piece = GetUncoloredPiece(m_aBoard[ii]);
 
             uZobristKey ^= m_aZobristTable[ii][piece][color];
         }
@@ -125,8 +123,8 @@ uint64_t ChessBoard::UpdateZobristKey(
 
     uint64_t newKey = oldKey;
 
-    int color = piece < W_ROOK ? BLACK : WHITE;
-    piece = piece < W_ROOK ? piece : eChessPiece(piece - NUM_PIECES);
+    int color = GetPieceColor(piece);
+    piece = GetUncoloredPiece(piece);
 
     newKey ^= m_aZobristTable[oldPos][piece][color];    // remove piece from the key
     newKey ^= m_aZobristTable[newPos][piece][color];    // re-add piece to the key in new position
