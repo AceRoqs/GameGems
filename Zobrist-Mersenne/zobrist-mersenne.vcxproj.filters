@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="zobrist.cpp">
+    <ClCompile Include="zobrist-mersenne.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
