@@ -8,8 +8,8 @@ Gems series. I wrote the following articles, both of which were included in
 [Game Programming Gems 6](http://amzn.to/noFiJx) \(2006\).
 
 This code is targetted toward Visual C++ 2010, though it should also work with
-GCC. The master branch serves as the up-to-date version of this code. The
-gems_bugfix branch contains the code and projects as they were written for the
+GCC. The master branch serves as the up\-to\-date version of this code. The
+gems\_bugfix branch contains the code and projects as they were written for the
 Gems books, with minor bug fixes as necessary.
 
 The Mersenne Twister code was written in a tutorial style, and is _not_
