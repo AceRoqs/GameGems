@@ -5,9 +5,9 @@
 // Supports Microsoft Visual C++ and GCC.
 //
 
-#include <iostream>
-#include <new>
 #include <cassert>
+#include <cstdint>
+#include <iostream>
 #include <vector>
 #include <algorithm>
 
@@ -16,13 +16,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4127) // conditional expression is constant
-#pragma warning(disable: 4311) // pointer truncation
 #endif
-
-//
-// uint32_t is defined in standard C, but not yet in standard C++.
-//
-typedef unsigned int uint32_t;
 
 //------------------------------------------------------------------------------
 //
@@ -57,12 +51,12 @@ typedef unsigned int uint32_t;
 //
 // All of the CAS functions will operate on a node.  So we define node first.
 //
-template<typename T> struct node {
-    T value;
-    node<T> * volatile pNext;
+template<typename Ty> struct node {
+    Ty value;
+    node<Ty> * volatile pNext;
 
-    node() : value(), pNext(NULL) {}
-    node(T v) : pNext(NULL), value(v) {}
+    node() : value(), pNext(nullptr) {}
+    node(Ty v) : pNext(nullptr), value(v) {}
 };
 
 // CAS will assume a multi-processor machine (versus multithread on a single processor).
@@ -79,8 +73,8 @@ template<typename T> struct node {
 // Define a version of CAS which uses x86 assembly primitives.
 //
 #ifdef _X86_
-template<typename T>
-bool CAS_assembly(node<T> * volatile * _ptr, node<T> * oldVal, node<T> * newVal)
+template<typename Ty>
+bool CAS_assembly(node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
 {
     register bool f;
 
@@ -116,8 +110,8 @@ extern "C" long __cdecl _InterlockedCompareExchange(long volatile * Dest, long E
 
 #pragma intrinsic (_InterlockedCompareExchange)
 
-template<typename T>
-bool CAS_intrinsic(node<T> * volatile * _ptr, node<T> * oldVal, node<T> * newVal)
+template<typename Ty>
+bool CAS_intrinsic(node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
 {
     return _InterlockedCompareExchange((long *)_ptr, (long)newVal, (long)oldVal) == (long)oldVal;
 }
@@ -127,8 +121,8 @@ bool CAS_intrinsic(node<T> * volatile * _ptr, node<T> * oldVal, node<T> * newVal
 //
 // Define a version of CAS which uses the Windows API InterlockedCompareExchange.
 //
-template<typename T>
-bool CAS_windows(node<T> * volatile * _ptr, node<T> * oldVal, node<T> * newVal)
+template<typename Ty>
+bool CAS_windows(node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
 {
     return InterlockedCompareExchange((long *)_ptr, (long)newVal, (long)oldVal) == (long)oldVal;
 }
@@ -159,8 +153,8 @@ bool CAS_windows(node<T> * volatile * _ptr, node<T> * oldVal, node<T> * newVal)
 // Define a version of CAS2 which uses x86 assembly primitives.
 //
 #ifdef _X86_
-template<typename T>
-bool CAS2_assembly(node<T> * volatile * _ptr, node<T> * old1, uint32_t old2, node<T> * new1, uint32_t new2)
+template<typename Ty>
+bool CAS2_assembly(node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, node<Ty> * new1, uint32_t new2)
 {
     register bool f;
 #ifdef __GNUC__
@@ -196,8 +190,8 @@ extern "C" __int64 __cdecl _InterlockedCompareExchange64(__int64 volatile * Dest
 
 #pragma intrinsic (_InterlockedCompareExchange64)
 
-template<typename T>
-bool CAS2_intrinsic(node<T> * volatile * _ptr, node<T> * old1, uint32_t old2, node<T> * new1, uint32_t new2)
+template<typename Ty>
+bool CAS2_intrinsic(node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, node<Ty> * new1, uint32_t new2)
 {
     LONGLONG Comperand = reinterpret_cast<LONG>(old1) | (static_cast<LONGLONG>(old2) << 32);
     LONGLONG Exchange  = reinterpret_cast<LONG>(new1) | (static_cast<LONGLONG>(new2) << 32);
@@ -215,8 +209,8 @@ bool CAS2_intrinsic(node<T> * volatile * _ptr, node<T> * old1, uint32_t old2, no
 
 // LONGLONG InterlockedCompareExchange64(LONGLONG volatile * Destination, LONGLONG Exchange, LONGLONG Comperand);
 
-template<typename T>
-bool CAS2_windows(node<T> * volatile * _ptr, node<T> * old1, uint32_t old2, node<T> * new1, uint32_t new2)
+template<typename Ty>
+bool CAS2_windows(node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, node<Ty> * new1, uint32_t new2)
 {
     LONGLONG Comperand = reinterpret_cast<long>(old1) | (static_cast<LONGLONG>(old2) << 32);
     LONGLONG Exchange  = reinterpret_cast<long>(new1) | (static_cast<LONGLONG>(new2) << 32);
@@ -230,19 +224,19 @@ bool CAS2_windows(node<T> * volatile * _ptr, node<T> * old1, uint32_t old2, node
 // Parameterized Lock-free Stack
 //
 //------------------------------------------------------------------------------
-template<typename T> class LockFreeStack {
+template<typename Ty> class LockFreeStack {
     // NOTE: the order of these members is assumed by CAS2.
-    node<T> * volatile _pHead;
+    node<Ty> * volatile _pHead;
     volatile uint32_t  _cPops;
 
 public:
-    void Push(node<T> * pNode);
-    node<T> * Pop();
+    void Push(node<Ty> * pNode);
+    node<Ty> * Pop();
 
-    LockFreeStack() : _pHead(NULL), _cPops(0) {}
+    LockFreeStack() : _pHead(nullptr), _cPops(0) {}
 };
 
-template<typename T> void LockFreeStack<T>::Push(node<T> * pNode)
+template<typename Ty> void LockFreeStack<Ty>::Push(node<Ty> * pNode)
 {
     while(true)
     {
@@ -254,22 +248,22 @@ template<typename T> void LockFreeStack<T>::Push(node<T> * pNode)
     }
 }
 
-template<typename T> node<T> * LockFreeStack<T>::Pop()
+template<typename Ty> node<Ty> * LockFreeStack<Ty>::Pop()
 {
     while(true)
     {
-        node<T> * pHead = _pHead;
+        node<Ty> * pHead = _pHead;
         uint32_t  cPops = _cPops;
-        if(NULL == pHead)
+        if(nullptr == pHead)
         {
-            return NULL;
+            return nullptr;
         }
 
         // NOTE: Memory reclaimation is difficult in this context.  If another thread breaks in here
         // and pops the head, and then frees it, then pHead->pNext is an invalid operation.  One solution
         // would be to use hazard pointers (http://researchweb.watson.ibm.com/people/m/michael/ieeetpds-2004.pdf).
 
-        node<T> * pNext = pHead->pNext;
+        node<Ty> * pNext = pHead->pNext;
         if(CAS2(&_pHead, pHead, cPops, pNext, cPops + 1))
         {
             return pHead;
@@ -282,28 +276,28 @@ template<typename T> node<T> * LockFreeStack<T>::Pop()
 // Parameterized Lock-free Queue
 //
 //------------------------------------------------------------------------------
-template<typename T> class LockFreeQueue {
+template<typename Ty> class LockFreeQueue {
     // NOTE: the order of these members is assumed by CAS2.
-    node<T> * volatile _pHead;
+    node<Ty> * volatile _pHead;
     volatile uint32_t  _cPops;
-    node<T> * volatile _pTail;
+    node<Ty> * volatile _pTail;
     volatile uint32_t  _cPushes;
 
 public:
-    void Add(node<T> * pNode);
-    node<T> * Remove();
+    void Add(node<Ty> * pNode);
+    node<Ty> * Remove();
 
-    LockFreeQueue(node<T> * pDummy) : _cPops(0), _cPushes(0)
+    LockFreeQueue(node<Ty> * pDummy) : _cPops(0), _cPushes(0)
     {
         _pHead = _pTail = pDummy;
     }
 };
 
-template<typename T> void LockFreeQueue<T>::Add(node<T> * pNode) {
-    pNode->pNext = NULL;
+template<typename Ty> void LockFreeQueue<Ty>::Add(node<Ty> * pNode) {
+    pNode->pNext = nullptr;
 
     uint32_t cPushes;
-    node<T> * pTail;
+    node<Ty> * pTail;
 
     while(true)
     {
@@ -315,7 +309,7 @@ template<typename T> void LockFreeQueue<T>::Add(node<T> * pNode) {
 
         // If the node that the tail points to is the last node
         // then update the last node to point at the new node.
-        if(CAS(&(_pTail->pNext), reinterpret_cast<node<T> *>(NULL), pNode))
+        if(CAS(&(_pTail->pNext), reinterpret_cast<node<Ty> *>(nullptr), pNode))
         {
             break;
         }
@@ -332,16 +326,16 @@ template<typename T> void LockFreeQueue<T>::Add(node<T> * pNode) {
     CAS2(&_pTail, pTail, cPushes, pNode, cPushes + 1);
 }
 
-template<typename T> node<T> * LockFreeQueue<T>::Remove() {
-    T value = T();
-    node<T> * pHead;
+template<typename Ty> node<Ty> * LockFreeQueue<Ty>::Remove() {
+    Ty value = Ty();
+    node<Ty> * pHead;
 
     while(true)
     {
         uint32_t cPops = _cPops;
         uint32_t cPushes = _cPushes;
         pHead = _pHead;
-        node<T> * pNext = pHead->pNext;
+        node<Ty> * pNext = pHead->pNext;
 
         // Verify that we did not get the pointers in the middle
         // of another update.
@@ -352,16 +346,16 @@ template<typename T> node<T> * LockFreeQueue<T>::Remove() {
         // Check if the queue is empty.
         if(pHead == _pTail)
         {
-            if(NULL == pNext)
+            if(nullptr == pNext)
             {
-                pHead = NULL; // queue is empty
+                pHead = nullptr;    // queue is empty
                 break;
             }
             // Special case if the queue has nodes but the tail
             // is just behind. Move the tail off of the head.
             CAS2(&_pTail, pHead, cPushes, pNext, cPushes + 1);
         }
-        else if(NULL != pNext)
+        else if(nullptr != pNext)
         {
             value = pNext->value;
             // Move the head pointer, effectively removing the node
@@ -371,7 +365,7 @@ template<typename T> node<T> * LockFreeQueue<T>::Remove() {
             }
         }
     }
-    if(NULL != pHead)
+    if(nullptr != pHead)
     {
         pHead->value = value;
     }
@@ -383,7 +377,7 @@ template<typename T> node<T> * LockFreeQueue<T>::Remove() {
 // Parameterized Lock-free Freelist
 //
 //------------------------------------------------------------------------------
-template<typename T> class LockFreeFreeList {
+template<typename Ty> class LockFreeFreeList {
     // Not implemented to prevent accidental copying.
     LockFreeFreeList(const LockFreeFreeList&);
     LockFreeFreeList& operator=(const LockFreeFreeList&);
@@ -395,8 +389,8 @@ template<typename T> class LockFreeFreeList {
     // object's lifetime.  Any thread synchronization should be done at that
     // point.
     //
-    LockFreeStack<T> _Freelist;
-    node<T> * _pObjects;
+    LockFreeStack<Ty> _Freelist;
+    node<Ty> * _pObjects;
     const uint32_t _cObjects;
 
 public:
@@ -411,7 +405,7 @@ public:
         // The Freelist may live on the stack, so we allocate the
         // actual nodes on the heap to minimize the space hit.
         //
-        _pObjects = new node<T>[cObjects];
+        _pObjects = new node<Ty>[cObjects];
         FreeAll();
     }
     ~LockFreeFreeList()
@@ -419,7 +413,7 @@ public:
 #ifdef _DEBUG
         for(uint32_t ix = 0; ix < _cObjects; ++ix)
         {
-            assert(_Freelist.Pop() != NULL);
+            assert(_Freelist.Pop() != nullptr);
         }
 #endif
 
@@ -432,15 +426,15 @@ public:
             _Freelist.Push(&_pObjects[ix]);
         }
     }
-    T * NewInstance()
+    Ty * NewInstance()
     {
-        node<T> * pInstance = _Freelist.Pop();
-        return new(&pInstance->value) T;
+        node<Ty> * pInstance = _Freelist.Pop();
+        return new(&pInstance->value) Ty;
     }
-    void FreeInstance(T * pInstance)
+    void FreeInstance(Ty * pInstance)
     {
-        pInstance->~T();
-        _Freelist.Push(reinterpret_cast<node<T> *>(pInstance));
+        pInstance->~Ty();
+        _Freelist.Push(reinterpret_cast<node<Ty> *>(pInstance));
     }
 };
 
@@ -561,12 +555,12 @@ void Test_CAS_windows()
     }
 }
 
-template<typename T>
+template<typename Ty>
 struct CAS2Test
 {
-    node<T> * pNode;
+    node<Ty> * pNode;
     uint32_t  tag;
-    CAS2Test(node<T> * pnewNode, uint32_t newTag) : pNode(pnewNode), tag(newTag) {}
+    CAS2Test(node<Ty> * pnewNode, uint32_t newTag) : pNode(pnewNode), tag(newTag) {}
 };
 
 //
@@ -715,14 +709,14 @@ void HandleWait(HANDLE & hThread)
     CloseHandle(hThread);
 }
 
-template<typename T>
-void CreateNode(node<T> * & pNode)
+template<typename Ty>
+void CreateNode(node<Ty> * & pNode)
 {
-    pNode = new node<T>;
+    pNode = new node<Ty>;
 }
 
-template<typename T>
-void DeleteNode(node<T> * & pNode)
+template<typename Ty>
+void DeleteNode(node<Ty> * & pNode)
 {
     delete pNode;
 }
@@ -730,21 +724,21 @@ void DeleteNode(node<T> * & pNode)
 //
 // Stress the multithreaded stack code.
 //
-template<typename T, int NUMTHREADS>
+template<typename Ty, int NUMTHREADS>
 class StressStack
 {
-    LockFreeStack<T> _stack;
+    LockFreeStack<Ty> _stack;
 
     static const unsigned int cNodes = 100;    // nodes per thread
 
     struct ThreadData
     {
-        StressStack<T, NUMTHREADS> * pStress;
+        StressStack<Ty, NUMTHREADS> * pStress;
         DWORD thread_num;
     };
 
     std::vector<ThreadData> _aThreadData;
-    std::vector<node<T> *> _apNodes;
+    std::vector<node<Ty> *> _apNodes;
 
 public:
     StressStack() : _aThreadData(NUMTHREADS), _apNodes(cNodes * NUMTHREADS) {}
@@ -761,7 +755,7 @@ public:
         //
         // Create all of the nodes.
         //
-        std::for_each(_apNodes.begin(), _apNodes.end(), CreateNode<T>);
+        std::for_each(_apNodes.begin(), _apNodes.end(), CreateNode<Ty>);
 
         unsigned int ii;
         for(ii = 0; ii < _aThreadData.size(); ++ii)
@@ -774,7 +768,7 @@ public:
         for(ii = 0; ii < aHandles.size(); ++ii)
         {
             unsigned int tid;
-            aHandles[ii] = (HANDLE)_beginthreadex(NULL, 0, StackThreadFunc, &_aThreadData[ii], 0, &tid);
+            aHandles[ii] = (HANDLE)_beginthreadex(nullptr, 0, StackThreadFunc, &_aThreadData[ii], 0, &tid);
         }
 
         //
@@ -785,7 +779,7 @@ public:
         //
         // Delete all of the nodes.
         //
-        std::for_each(_apNodes.begin(), _apNodes.end(), DeleteNode<T>);
+        std::for_each(_apNodes.begin(), _apNodes.end(), DeleteNode<Ty>);
 
         //
         // Ideas for improvement:
@@ -826,28 +820,28 @@ public:
 //
 // Stress the multithreaded queue code.
 //
-template<typename T, int NUMTHREADS>
+template<typename Ty, int NUMTHREADS>
 class StressQueue
 {
     // Declare undefined assignment operator due to const data member.
     // http://support.microsoft.com/kb/87638
     StressQueue& operator=(const StressQueue&);
 
-    LockFreeQueue<T> _queue;
+    LockFreeQueue<Ty> _queue;
 
     struct ThreadData
     {
-        StressQueue<T, NUMTHREADS> * pStress;
+        StressQueue<Ty, NUMTHREADS> * pStress;
         DWORD thread_num;
     };
 
     std::vector<ThreadData> _aThreadData;
-    std::vector<node<T> *> & _apNodes;
+    std::vector<node<Ty> *> & _apNodes;
 
 public:
     static const unsigned int cNodes = 100;     // nodes per thread
 
-    StressQueue(std::vector<node<T> *> & apNodes) : _queue(apNodes[0]), _aThreadData(NUMTHREADS), _apNodes(apNodes) {}
+    StressQueue(std::vector<node<Ty> *> & apNodes) : _queue(apNodes[0]), _aThreadData(NUMTHREADS), _apNodes(apNodes) {}
 
     //
     // The queue stress will spawn a number of threads (4096 in our tests), each of which will
@@ -869,7 +863,7 @@ public:
         for(ii = 0; ii < aHandles.size(); ++ii)
         {
             unsigned int tid;
-            aHandles[ii] = (HANDLE)_beginthreadex(NULL, 0, QueueThreadFunc, &_aThreadData[ii], 0, &tid);
+            aHandles[ii] = (HANDLE)_beginthreadex(nullptr, 0, QueueThreadFunc, &_aThreadData[ii], 0, &tid);
         }
 
         //
@@ -974,7 +968,7 @@ int main(int, char **)
     LockFreeStack<MyStruct> stack;
     stack.Push(&Nodes[1]);
     stack.Pop();        // returns &Nodes[1]
-    stack.Pop();        // returns NULL
+    stack.Pop();        // returns nullptr
 
     //
     // Test Lock-free Queue
@@ -992,7 +986,7 @@ int main(int, char **)
 
     queue.Add(&Nodes[1]);
     queue.Remove();     // returns &Nodes[1]
-    queue.Remove();     // returns NULL;
+    queue.Remove();     // returns nullptr;
 
     //
     // Demonstrate Lock-free Freelist
