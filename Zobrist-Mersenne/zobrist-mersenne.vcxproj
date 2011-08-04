@@ -152,10 +152,12 @@
   <ItemGroup>
     <ClCompile Include="mersenne.cpp" />
     <ClCompile Include="zobrist-mersenne.cpp" />
+    <ClCompile Include="zobrist.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mersenne.h" />
     <ClInclude Include="pow2.h" />
+    <ClInclude Include="zobrist.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
