@@ -65,7 +65,7 @@ void ChessBoard::PopulateChessBoard()
 
     for(ii = 0; ii < BOARD_SIZE; ii++)
     {
-        assert(m_aBoard[ii] >= EMPTY && m_aBoard[ii] <= W_PAWN);
+        assert(m_aBoard[ii] >= B_ROOK && m_aBoard[ii] <= EMPTY);
     }
 }
 

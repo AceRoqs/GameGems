@@ -8,9 +8,9 @@ const int BOARD_SIZE = 8 * 8;   // size of chess board
 const int NUM_PIECES = 6;       // rook, knight, bishop, king, queen, pawn
 const int NUM_COLORS = 2;       // white, black
 
-enum eChessPiece { EMPTY,
-                   B_ROOK, B_KNIGHT, B_BISHOP, B_KING, B_QUEEN, B_PAWN,
-                   W_ROOK, W_KNIGHT, W_BISHOP, W_KING, W_QUEEN, W_PAWN };
+enum eChessPiece { B_ROOK, B_KNIGHT, B_BISHOP, B_KING, B_QUEEN, B_PAWN,
+                   W_ROOK, W_KNIGHT, W_BISHOP, W_KING, W_QUEEN, W_PAWN,
+                   EMPTY };
 enum eColor { BLACK, WHITE };
 
 class ChessBoard
