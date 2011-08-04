@@ -31,11 +31,12 @@
 #ifndef CAS
 #ifdef _X86_
 #define CAS CAS_assembly
-//#define CAS CAS_intrinsic
-//#define CAS CAS_windows
-#else
+#elif defined(__GNUC__)
+#define CAS CAS_windows
+#elif defined(_MSC_VER)
 #define CAS CAS_intrinsic
-//#define CAS CAS_windows
+#else
+#error No CAS implemented for this compiler/architecture combination.
 #endif
 #endif
 
@@ -94,11 +95,11 @@ bool CAS_assembly(node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newV
         lock cmpxchg [ecx],ebx
         setz f
     }
-#endif // __GNUC__
+#endif
 
     return f;
 }
-#endif
+#endif // _X86_
 
 //
 // Define a version of CAS which uses the Visual C++ InterlockedCompareExchange intrinsic.
@@ -134,18 +135,19 @@ bool CAS_windows(node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVa
 //------------------------------------------------------------------------------
 
 //
-// Define what code we will be using for CAS.
+// Define what code we will be using for CAS2.
 // Intrinsic only available on Visual C++.
 // Windows version only available on Windows Vista.
 //
 #ifndef CAS2
 #ifdef _X86_
 #define CAS2 CAS2_assembly
-//#define CAS2 CAS2_intrinsic
-//#define CAS2 CAS2_windows
-#else
+#elif defined(__GNUC__)
+#define CAS2 CAS2_windows
+#elif defined(_MSC_VER)
 #define CAS2 CAS2_intrinsic
-//#define CAS2 CAS2_windows
+#else
+#error No CAS2 implemented for this compiler/architecture combination.
 #endif
 #endif
 
@@ -178,7 +180,7 @@ bool CAS2_assembly(node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, n
 #endif
     return f;
 }
-#endif
+#endif // _X86_
 
 //
 // Define a version of CAS2 which uses the Visual C++ InterlockedCompareExchange64 intrinsic.
@@ -485,18 +487,18 @@ void Test_CAS_assembly()
         }
     }
 #else
-    std::cout << "CAS is not implemented for this architecture." << std::endl;
+    std::cout << "CAS_assembly is not implemented for this architecture." << std::endl;
 #endif
 }
 
 //
 // Verify compiler intrinsic version of CAS.
 //
-#ifdef _MSC_VER
 void Test_CAS_intrinsic()
 {
     std::cout << "Testing CAS_intrinsic...";
 
+#ifdef _MSC_VER
     node<MyStruct> oldVal;
     node<MyStruct> newVal;
     node<MyStruct> * pNode = &newVal;
@@ -520,8 +522,10 @@ void Test_CAS_intrinsic()
             std::cout << "CAS is correct." << std::endl;
         }
     }
-}
+#else
+    std::cout << "CAS_intrinsic is not implemented for this compiler." << std::endl;
 #endif
+}
 
 //
 // Verify Windows API version of CAS.
@@ -607,18 +611,18 @@ void Test_CAS2_assembly()
         }
     }
 #else
-    std::cout << "CAS2 not implemented for this architecture." << std::endl;
+    std::cout << "CAS2_assembly not implemented for this architecture." << std::endl;
 #endif
 }
 
 //
 // Verify compiler intrinsic version of CAS.
 //
-#ifdef _MSC_VER
 void Test_CAS2_intrinsic()
 {
     std::cout << "Testing CAS2_intrinsic...";
 
+#ifdef _MSC_VER
     node<MyStruct> oldVal;
     node<MyStruct> newVal;
 
@@ -654,17 +658,19 @@ void Test_CAS2_intrinsic()
             std::cout << "CAS2 is correct." << std::endl;
         }
     }
-}
+#else
+    std::cout << "CAS2_intrinsic is not implemented for this compiler." << std::endl;
 #endif
+}
 
 //
 // Verify Windows API version of CAS2.
 //
-#if WINVER >= 0x0600
 void Test_CAS2_windows()
 {
     std::cout << "Testing CAS2_windows...";
 
+#if WINVER >= 0x0600
     node<MyStruct> oldVal;
     node<MyStruct> newVal;
 
@@ -700,8 +706,10 @@ void Test_CAS2_windows()
             std::cout << "CAS2 is correct." << std::endl;
         }
     }
+#else
+    std::cout << "CAS2_windows is not implemented on this architecture." << std::endl;
+#endif
 }
-#endif  // WINVER >= 0x0600
 
 void HandleWait(HANDLE & hThread)
 {
@@ -944,18 +952,12 @@ int main(int, char **)
     // Test CAS and CAS2
     //
     Test_CAS_assembly();
-#ifdef _MSC_VER
     Test_CAS_intrinsic();
-#endif
     Test_CAS_windows();
 
     Test_CAS2_assembly();
-#ifdef _MSC_VER
     Test_CAS2_intrinsic();
-#endif
-#if WINVER >= 0x0600
     Test_CAS2_windows();
-#endif
 
     //
     // Test Lock-free Stack
@@ -995,3 +997,4 @@ int main(int, char **)
 
     return 0;
 }
+
