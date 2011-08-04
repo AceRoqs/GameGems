@@ -1,9 +1,10 @@
 // Demonstration code for Zobrist Hash using the Mersenne Twister
-// Compiles under Visual Studio .NET 2003 under Windows and gcc under Linux.
+// Compiles under Visual Studio 2010 under Windows and gcc under Linux.
 // By Toby Jones
 
-#include <iostream>
 #include <cassert>
+#include <cstdint>
+#include <iostream>
 
 // Specialized templates to compute powers of two at compile time
 // (template metaprogramming)
@@ -24,14 +25,6 @@ struct Pow2Minus1
 {
     enum { value = Pow2<N - 1>::value - 1 + Pow2<N - 1>::value };
 };
-
-// This is defined in C99, but not C++ yet (June 2003)
-typedef unsigned long uint32_t;
-#if defined(_WIN32)
-typedef unsigned __int64 uint64_t;
-#elif defined (__GNUC__)
-typedef unsigned long long uint64_t;
-#endif
 
 // Parameters for MT19937
 // See Matsumoto for definition of parameters, and
@@ -361,18 +354,6 @@ static void TestMT()
     }
 }
 
-// Visual C++ 6.0 does not have an unsigned 64-bit operator<<
-// Visual Studio .NET 2003 and gcc do not have this issue.
-static std::ostream & Output64(std::ostream & os, uint64_t ui64)
-{
-    os << (uint32_t)((ui64 >> 32) & 0xFFFFFFFF);
-    os.unsetf(std::ios::showbase);
-    os << (uint32_t)(ui64 & 0xFFFFFFFF);
-    os.setf(std::ios::showbase);
-
-    return os;
-}
-
 // Demonstrate that a full hash calculation is the same as an incremental operation
 static void TestZH()
 {
@@ -389,14 +370,14 @@ static void TestZH()
     uint64_t newFullZobristKey = chessBoard.CalculateZobristKey(BLACK);
 
     std::cout << "Initial Zobrist Key: ";
-    Output64(std::cout, initialZobristKey) << std::endl;
+    std::cout << initialZobristKey << std::endl;
 
     std::cout << "Moving white pawn from a2 to a4..." << std::endl;
 
     std::cout << "New Zobrist Key (incremental): ";
-    Output64(std::cout, newIncrementalZobristKey) << std::endl;
+    std::cout << newIncrementalZobristKey << std::endl;
     std::cout << "New Zobrist Key (full):        ";
-    Output64(std::cout, newFullZobristKey) << std::endl;
+    std::cout << newFullZobristKey << std::endl;
 
     if(newIncrementalZobristKey == newFullZobristKey)
     {
