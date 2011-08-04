@@ -370,6 +370,10 @@ template<typename T> node<T> * LockFreeQueue<T>::Remove() {
 //
 //------------------------------------------------------------------------------
 template<typename T> class LockFreeFreeList {
+    // Not implemented to prevent accidental copying.
+    LockFreeFreeList(const LockFreeFreeList&);
+    LockFreeFreeList& operator=(const LockFreeFreeList&);
+
     //
     // Memory reclaimation is generally difficult with lock-free algorithms,
     // so we bypass the situation by making the object own all of the memory,
@@ -803,6 +807,10 @@ public:
 template<typename T, int NUMTHREADS>
 class StressQueue
 {
+    // Declare undefined assignment operator due to const data member.
+    // http://support.microsoft.com/kb/87638
+    StressQueue& operator=(const StressQueue&);
+
     LockFreeQueue<T> _queue;
 
     struct ThreadData
