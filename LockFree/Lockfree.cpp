@@ -35,9 +35,14 @@ typedef unsigned int uint32_t;
 // Intrinsic only available on Visual C++.
 //
 #ifndef CAS
+#ifdef _X86_
 #define CAS CAS_assembly
 //#define CAS CAS_intrinsic
 //#define CAS CAS_windows
+#else
+#define CAS CAS_intrinsic
+//#define CAS CAS_windows
+#endif
 #endif
 
 // this function is atomic
@@ -73,6 +78,7 @@ template<typename T> struct node {
 //
 // Define a version of CAS which uses x86 assembly primitives.
 //
+#ifdef _X86_
 template<typename T>
 bool CAS_assembly(node<T> * volatile * _ptr, node<T> * oldVal, node<T> * newVal)
 {
@@ -98,6 +104,7 @@ bool CAS_assembly(node<T> * volatile * _ptr, node<T> * oldVal, node<T> * newVal)
 
     return f;
 }
+#endif
 
 //
 // Define a version of CAS which uses the Visual C++ InterlockedCompareExchange intrinsic.
@@ -138,14 +145,20 @@ bool CAS_windows(node<T> * volatile * _ptr, node<T> * oldVal, node<T> * newVal)
 // Windows version only available on Windows Vista.
 //
 #ifndef CAS2
+#ifdef _X86_
 #define CAS2 CAS2_assembly
 //#define CAS2 CAS2_intrinsic
 //#define CAS2 CAS2_windows
+#else
+#define CAS2 CAS2_intrinsic
+//#define CAS2 CAS2_windows
+#endif
 #endif
 
 //
 // Define a version of CAS2 which uses x86 assembly primitives.
 //
+#ifdef _X86_
 template<typename T>
 bool CAS2_assembly(node<T> * volatile * _ptr, node<T> * old1, uint32_t old2, node<T> * new1, uint32_t new2)
 {
@@ -171,6 +184,7 @@ bool CAS2_assembly(node<T> * volatile * _ptr, node<T> * old1, uint32_t old2, nod
 #endif
     return f;
 }
+#endif
 
 //
 // Define a version of CAS2 which uses the Visual C++ InterlockedCompareExchange64 intrinsic.
@@ -452,6 +466,7 @@ void Test_CAS_assembly()
 {
     std::cout << "Testing CAS_assembly...";
 
+#ifdef _X86_
     node<MyStruct> oldVal;
     node<MyStruct> newVal;
     node<MyStruct> * pNode = &newVal;
@@ -475,6 +490,9 @@ void Test_CAS_assembly()
             std::cout << "CAS is correct." << std::endl;
         }
     }
+#else
+    std::cout << "CAS is not implemented for this architecture." << std::endl;
+#endif
 }
 
 //
@@ -558,6 +576,7 @@ void Test_CAS2_assembly()
 {
     std::cout << "Testing CAS2_assembly...";
 
+#ifdef _X86_
     node<MyStruct> oldVal;
     node<MyStruct> newVal;
 
@@ -593,6 +612,9 @@ void Test_CAS2_assembly()
             std::cout << "CAS2 is correct." << std::endl;
         }
     }
+#else
+    std::cout << "CAS2 not implemented for this architecture." << std::endl;
+#endif
 }
 
 //
