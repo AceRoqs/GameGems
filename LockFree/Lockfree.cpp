@@ -74,12 +74,15 @@ struct node
 // instead of just cmpxchg, as the bus needs to be locked to synchronize the processors
 // access to memory.
 
+// SAL annotations on most parameters in CAS/CAS2 are not necessary, as the pointers
+// themselves are not dereferenced.
+
 //
 // Define a version of CAS which uses x86 assembly primitives.
 //
 #ifdef _X86_
 template<typename Ty>
-bool CAS_assembly(node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
+bool CAS_assembly(_Inout_ node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
 {
     register bool f;
 
@@ -111,12 +114,12 @@ bool CAS_assembly(node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newV
 #ifdef _MSC_VER
 
 // Define intrinsic for InterlockedCompareExchange
-extern "C" long __cdecl _InterlockedCompareExchange(long volatile * Dest, long Exchange, long Comp);
+extern "C" long __cdecl _InterlockedCompareExchange(_Inout_ long volatile * Dest, long Exchange, long Comp);
 
-#pragma intrinsic (_InterlockedCompareExchange)
+#pragma intrinsic(_InterlockedCompareExchange)
 
 template<typename Ty>
-bool CAS_intrinsic(node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
+bool CAS_intrinsic(_Inout_ node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
 {
     return _InterlockedCompareExchange((long *)_ptr, (long)newVal, (long)oldVal) == (long)oldVal;
 }
@@ -127,7 +130,7 @@ bool CAS_intrinsic(node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * new
 // Define a version of CAS which uses the Windows API InterlockedCompareExchange.
 //
 template<typename Ty>
-bool CAS_windows(node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
+bool CAS_windows(_Inout_ node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
 {
     return InterlockedCompareExchange((long *)_ptr, (long)newVal, (long)oldVal) == (long)oldVal;
 }
@@ -155,12 +158,15 @@ bool CAS_windows(node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVa
 #endif
 #endif
 
+// _Inout_count_c_(2) is the best SAL annotation possible, though it will not
+// prevent a single element buffer from being passed.
+
 //
 // Define a version of CAS2 which uses x86 assembly primitives.
 //
 #ifdef _X86_
 template<typename Ty>
-bool CAS2_assembly(node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, node<Ty> * new1, uint32_t new2)
+bool CAS2_assembly(_Inout_count_c_(2) node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, node<Ty> * new1, uint32_t new2)
 {
     register bool f;
 #ifdef __GNUC__
@@ -192,12 +198,12 @@ bool CAS2_assembly(node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, n
 #ifdef _MSC_VER
 
 // Define intrinsic for InterlockedCompareExchange64
-extern "C" __int64 __cdecl _InterlockedCompareExchange64(__int64 volatile * Destination, __int64 Exchange, __int64 Comperand);
+extern "C" __int64 __cdecl _InterlockedCompareExchange64(_Inout_ __int64 volatile * Destination, __int64 Exchange, __int64 Comperand);
 
-#pragma intrinsic (_InterlockedCompareExchange64)
+#pragma intrinsic(_InterlockedCompareExchange64)
 
 template<typename Ty>
-bool CAS2_intrinsic(node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, node<Ty> * new1, uint32_t new2)
+bool CAS2_intrinsic(_Inout_count_c_(2) node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, node<Ty> * new1, uint32_t new2)
 {
     LONGLONG Comperand = reinterpret_cast<LONG>(old1) | (static_cast<LONGLONG>(old2) << 32);
     LONGLONG Exchange  = reinterpret_cast<LONG>(new1) | (static_cast<LONGLONG>(new2) << 32);
@@ -216,7 +222,7 @@ bool CAS2_intrinsic(node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, 
 // LONGLONG InterlockedCompareExchange64(LONGLONG volatile * Destination, LONGLONG Exchange, LONGLONG Comperand);
 
 template<typename Ty>
-bool CAS2_windows(node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, node<Ty> * new1, uint32_t new2)
+bool CAS2_windows(_Inout_count_c_(2) node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, node<Ty> * new1, uint32_t new2)
 {
     LONGLONG Comperand = reinterpret_cast<long>(old1) | (static_cast<LONGLONG>(old2) << 32);
     LONGLONG Exchange  = reinterpret_cast<long>(new1) | (static_cast<LONGLONG>(new2) << 32);
@@ -238,14 +244,16 @@ class LockFreeStack
     volatile uint32_t  _cPops;
 
 public:
-    void Push(node<Ty> * pNode);
+    // The correct SAL annotation is _In_, but /analyze cannot deduce the
+    // size of node<Ty> unless it is made explicit.
+    void Push(_In_bytecount_c_(sizeof node<Ty>) node<Ty> * pNode);
     node<Ty> * Pop();
 
     LockFreeStack() : _pHead(nullptr), _cPops(0) {}
 };
 
 template<typename Ty>
-void LockFreeStack<Ty>::Push(node<Ty> * pNode)
+void LockFreeStack<Ty>::Push(_In_bytecount_c_(sizeof node<Ty>) node<Ty> * pNode)
 {
     while(true)
     {
@@ -295,17 +303,19 @@ class LockFreeQueue {
     volatile uint32_t  _cPushes;
 
 public:
-    void Add(node<Ty> * pNode);
+    // The correct SAL annotation is _In_, but /analyze cannot deduce the
+    // size of node<Ty> unless it is made explicit.
+    void Add(_In_bytecount_c_(sizeof node<Ty>) node<Ty> * pNode);
     node<Ty> * Remove();
 
-    LockFreeQueue(node<Ty> * pDummy) : _cPops(0), _cPushes(0)
+    LockFreeQueue(_In_ node<Ty> * pDummy) : _cPops(0), _cPushes(0)
     {
         _pHead = _pTail = pDummy;
     }
 };
 
 template<typename Ty>
-void LockFreeQueue<Ty>::Add(node<Ty> * pNode)
+void LockFreeQueue<Ty>::Add(_In_bytecount_c_(sizeof node<Ty>) node<Ty> * pNode)
 {
     pNode->pNext = nullptr;
 
@@ -395,10 +405,6 @@ node<Ty> * LockFreeQueue<Ty>::Remove()
 template<typename Ty>
 class LockFreeFreeList
 {
-    // Not implemented to prevent accidental copying.
-    LockFreeFreeList(const LockFreeFreeList&);
-    LockFreeFreeList& operator=(const LockFreeFreeList&);
-
     //
     // Memory reclaimation is generally difficult with lock-free algorithms,
     // so we bypass the situation by making the object own all of the memory,
@@ -409,6 +415,10 @@ class LockFreeFreeList
     LockFreeStack<Ty> _Freelist;
     node<Ty> * _pObjects;
     const uint32_t _cObjects;
+
+    // Not implemented to prevent accidental copying.
+    LockFreeFreeList(const LockFreeFreeList&);
+    LockFreeFreeList& operator=(const LockFreeFreeList&);
 
 public:
     //
@@ -448,7 +458,10 @@ public:
         node<Ty> * pInstance = _Freelist.Pop();
         return new(&pInstance->value) Ty;
     }
-    void FreeInstance(Ty * pInstance)
+    // This is the best annotation possible given that the code hides
+    // that a node structure is actually what is being passed.
+    // This will not prevent an unwrapped 'Ty' from being passed.
+    void FreeInstance(_In_bytecount_c_(sizeof node<Ty>) Ty * pInstance)
     {
         pInstance->~Ty();
         _Freelist.Push(reinterpret_cast<node<Ty> *>(pInstance));
@@ -578,8 +591,8 @@ template<typename Ty>
 struct CAS2Test
 {
     node<Ty> * pNode;
-    uint32_t  tag;
-    CAS2Test(node<Ty> * pnewNode, uint32_t newTag) : pNode(pnewNode), tag(newTag) {}
+    uint32_t tag;
+    CAS2Test(_In_ node<Ty> * pnewNode, uint32_t newTag) : pNode(pnewNode), tag(newTag) {}
 };
 
 //
@@ -811,7 +824,7 @@ public:
         //
     } // void operator()()
 
-    static unsigned int __stdcall StackThreadFunc(void * pv)
+    static unsigned int __stdcall StackThreadFunc(_In_ void * pv)
     {
         unsigned int tid = GetCurrentThreadId();
         ThreadData * ptd = reinterpret_cast<ThreadData *>(pv);
@@ -846,10 +859,6 @@ public:
 template<typename Ty, int NUMTHREADS>
 class StressQueue
 {
-    // Declare undefined assignment operator due to const data member.
-    // http://support.microsoft.com/kb/87638
-    StressQueue& operator=(const StressQueue&);
-
     LockFreeQueue<Ty> _queue;
 
     struct ThreadData
@@ -860,6 +869,10 @@ class StressQueue
 
     std::vector<ThreadData> _aThreadData;
     std::vector<node<Ty> *> & _apNodes;
+
+    // Declare undefined assignment operator due to const data member.
+    // http://support.microsoft.com/kb/87638
+    StressQueue& operator=(const StressQueue&);
 
 public:
     static const unsigned int cNodes = 100;     // nodes per thread
@@ -901,7 +914,7 @@ public:
         //
     } // void operator()()
 
-    static unsigned int __stdcall QueueThreadFunc(void * pv)
+    static unsigned int __stdcall QueueThreadFunc(_In_ void * pv)
     {
         unsigned int tid = GetCurrentThreadId();
         ThreadData * ptd = reinterpret_cast<ThreadData *>(pv);
@@ -959,9 +972,9 @@ void Demo_Freelist()
 }
 
 //
-// Nothing of importance happens here. :)
+// Test the lock-free implementations.
 //
-int main(int, char **)
+int main()
 {
     //
     // Test CAS and CAS2
