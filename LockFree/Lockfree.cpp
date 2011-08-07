@@ -41,8 +41,10 @@
 #endif
 
 // this function is atomic
-// bool CAS(uint32_t *ptr, uint32_t oldVal, uint32_t newVal) {
-//     if(*ptr == oldVal) {
+// bool CAS(uint32_t *ptr, uint32_t oldVal, uint32_t newVal)
+// {
+//     if(*ptr == oldVal)
+//     {
 //         *ptr = newVal;
 //         return true;
 //     }
@@ -52,7 +54,9 @@
 //
 // All of the CAS functions will operate on a node.  So we define node first.
 //
-template<typename Ty> struct node {
+template<typename Ty>
+struct node
+{
     Ty value;
     node<Ty> * volatile pNext;
 
@@ -226,7 +230,9 @@ bool CAS2_windows(node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, no
 // Parameterized Lock-free Stack
 //
 //------------------------------------------------------------------------------
-template<typename Ty> class LockFreeStack {
+template<typename Ty>
+class LockFreeStack
+{
     // NOTE: the order of these members is assumed by CAS2.
     node<Ty> * volatile _pHead;
     volatile uint32_t  _cPops;
@@ -238,7 +244,8 @@ public:
     LockFreeStack() : _pHead(nullptr), _cPops(0) {}
 };
 
-template<typename Ty> void LockFreeStack<Ty>::Push(node<Ty> * pNode)
+template<typename Ty>
+void LockFreeStack<Ty>::Push(node<Ty> * pNode)
 {
     while(true)
     {
@@ -250,7 +257,8 @@ template<typename Ty> void LockFreeStack<Ty>::Push(node<Ty> * pNode)
     }
 }
 
-template<typename Ty> node<Ty> * LockFreeStack<Ty>::Pop()
+template<typename Ty>
+node<Ty> * LockFreeStack<Ty>::Pop()
 {
     while(true)
     {
@@ -278,7 +286,8 @@ template<typename Ty> node<Ty> * LockFreeStack<Ty>::Pop()
 // Parameterized Lock-free Queue
 //
 //------------------------------------------------------------------------------
-template<typename Ty> class LockFreeQueue {
+template<typename Ty>
+class LockFreeQueue {
     // NOTE: the order of these members is assumed by CAS2.
     node<Ty> * volatile _pHead;
     volatile uint32_t  _cPops;
@@ -295,7 +304,9 @@ public:
     }
 };
 
-template<typename Ty> void LockFreeQueue<Ty>::Add(node<Ty> * pNode) {
+template<typename Ty>
+void LockFreeQueue<Ty>::Add(node<Ty> * pNode)
+{
     pNode->pNext = nullptr;
 
     uint32_t cPushes;
@@ -328,7 +339,9 @@ template<typename Ty> void LockFreeQueue<Ty>::Add(node<Ty> * pNode) {
     CAS2(&_pTail, pTail, cPushes, pNode, cPushes + 1);
 }
 
-template<typename Ty> node<Ty> * LockFreeQueue<Ty>::Remove() {
+template<typename Ty>
+node<Ty> * LockFreeQueue<Ty>::Remove()
+{
     Ty value = Ty();
     node<Ty> * pHead;
 
@@ -379,7 +392,9 @@ template<typename Ty> node<Ty> * LockFreeQueue<Ty>::Remove() {
 // Parameterized Lock-free Freelist
 //
 //------------------------------------------------------------------------------
-template<typename Ty> class LockFreeFreeList {
+template<typename Ty>
+class LockFreeFreeList
+{
     // Not implemented to prevent accidental copying.
     LockFreeFreeList(const LockFreeFreeList&);
     LockFreeFreeList& operator=(const LockFreeFreeList&);
