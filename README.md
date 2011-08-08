@@ -1,6 +1,6 @@
-This the code that I used as the basis for my articles in the Game Programming
-Gems series. I wrote the following articles, both of which were included in
-[Best of Game Programming Gems](http://amzn.to/pODKPx).
+This is the code that I used as the basis for my articles in the Game
+Programming Gems series. I wrote the following articles, both of which were
+included in [Best of Game Programming Gems](http://amzn.to/pODKPx).
 
 * Zobrist Hash using the Mersenne Twister, first included in
 [Game Programming Gems 4](http://amzn.to/raRvoG) \(2004\).
