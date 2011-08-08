@@ -117,9 +117,13 @@ template<typename Ty>
 bool CAS_intrinsic(_Inout_ node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
 {
 #ifdef _X86_
-    return _InterlockedCompareExchange((long *)_ptr, (intptr_t)newVal, (intptr_t)oldVal) == (intptr_t)oldVal;
+    return _InterlockedCompareExchange(reinterpret_cast<long volatile *>(_ptr),
+                                       reinterpret_cast<intptr_t>(newVal),
+                                       reinterpret_cast<intptr_t>(oldVal)) == reinterpret_cast<intptr_t>(oldVal);
 #else
-    return _InterlockedCompareExchange64((__int64 *)_ptr, (intptr_t)newVal, (intptr_t)oldVal) == (intptr_t)oldVal;
+    return _InterlockedCompareExchange64(reinterpret_cast<__int64 volatile *>(_ptr),
+                                         reinterpret_cast<intptr_t>(newVal),
+                                         reinterpret_cast<intptr_t>(oldVal)) == reinterpret_cast<intptr_t>(oldVal);
 #endif
 }
 #endif  // _MSC_VER
@@ -131,9 +135,13 @@ template<typename Ty>
 bool CAS_windows(_Inout_ node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
 {
 #ifdef _X86_
-    return InterlockedCompareExchange((long *)_ptr, (intptr_t)newVal, (intptr_t)oldVal) == (intptr_t)oldVal;
+    return InterlockedCompareExchange(reinterpret_cast<long volatile *>(_ptr),
+                                      reinterpret_cast<intptr_t>(newVal),
+                                      reinterpret_cast<intptr_t>(oldVal)) == reinterpret_cast<intptr_t>(oldVal);
 #else
-    return InterlockedCompareExchange64((__int64 *)_ptr, (intptr_t)newVal, (intptr_t)oldVal) == (intptr_t)oldVal;
+    return InterlockedCompareExchange64(reinterpret_cast<__int64 volatile *>(_ptr),
+                                        reinterpret_cast<intptr_t>(newVal),
+                                        reinterpret_cast<intptr_t>(oldVal)) == reinterpret_cast<intptr_t>(oldVal);
 #endif
 }
 
@@ -804,7 +812,7 @@ public:
         for(ii = 0; ii < aHandles.size(); ++ii)
         {
             unsigned int tid;
-            aHandles[ii] = (HANDLE)_beginthreadex(nullptr, 0, StackThreadFunc, &_aThreadData[ii], 0, &tid);
+            aHandles[ii] = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, StackThreadFunc, &_aThreadData[ii], 0, &tid));
         }
 
         //
@@ -899,7 +907,7 @@ public:
         for(ii = 0; ii < aHandles.size(); ++ii)
         {
             unsigned int tid;
-            aHandles[ii] = (HANDLE)_beginthreadex(nullptr, 0, QueueThreadFunc, &_aThreadData[ii], 0, &tid);
+            aHandles[ii] = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, QueueThreadFunc, &_aThreadData[ii], 0, &tid));
         }
 
         //
