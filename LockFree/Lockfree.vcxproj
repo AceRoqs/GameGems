@@ -152,6 +152,12 @@
   <ItemGroup>
     <ClCompile Include="Lockfree.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lfcas.h" />
+    <ClInclude Include="lffreelist.h" />
+    <ClInclude Include="lfqueue.h" />
+    <ClInclude Include="lfstack.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

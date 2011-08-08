@@ -19,4 +19,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lfstack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lfcas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lfqueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lffreelist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
