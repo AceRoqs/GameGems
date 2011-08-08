@@ -13,6 +13,7 @@
 
 #include <windows.h>
 #include <process.h>
+#include <intrin.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4127) // conditional expression is constant
@@ -112,18 +113,15 @@ bool CAS_assembly(_Inout_ node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty
 // Define a version of CAS which uses the Visual C++ InterlockedCompareExchange intrinsic.
 //
 #ifdef _MSC_VER
-
-// Define intrinsic for InterlockedCompareExchange
-extern "C" long __cdecl _InterlockedCompareExchange(_Inout_ long volatile * Dest, long Exchange, long Comp);
-
-#pragma intrinsic(_InterlockedCompareExchange)
-
 template<typename Ty>
 bool CAS_intrinsic(_Inout_ node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
 {
-    return _InterlockedCompareExchange((long *)_ptr, (long)newVal, (long)oldVal) == (long)oldVal;
+#ifdef _X86_
+    return _InterlockedCompareExchange((long *)_ptr, (intptr_t)newVal, (intptr_t)oldVal) == (intptr_t)oldVal;
+#else
+    return _InterlockedCompareExchange64((__int64 *)_ptr, (intptr_t)newVal, (intptr_t)oldVal) == (intptr_t)oldVal;
+#endif
 }
-
 #endif  // _MSC_VER
 
 //
@@ -132,7 +130,11 @@ bool CAS_intrinsic(_Inout_ node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<T
 template<typename Ty>
 bool CAS_windows(_Inout_ node<Ty> * volatile * _ptr, node<Ty> * oldVal, node<Ty> * newVal)
 {
-    return InterlockedCompareExchange((long *)_ptr, (long)newVal, (long)oldVal) == (long)oldVal;
+#ifdef _X86_
+    return InterlockedCompareExchange((long *)_ptr, (intptr_t)newVal, (intptr_t)oldVal) == (intptr_t)oldVal;
+#else
+    return InterlockedCompareExchange64((__int64 *)_ptr, (intptr_t)newVal, (intptr_t)oldVal) == (intptr_t)oldVal;
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -196,34 +198,32 @@ bool CAS2_assembly(_Inout_count_c_(2) node<Ty> * volatile * _ptr, node<Ty> * old
 // Define a version of CAS2 which uses the Visual C++ InterlockedCompareExchange64 intrinsic.
 //
 #ifdef _MSC_VER
-
-// Define intrinsic for InterlockedCompareExchange64
-extern "C" __int64 __cdecl _InterlockedCompareExchange64(_Inout_ __int64 volatile * Destination, __int64 Exchange, __int64 Comperand);
-
-#pragma intrinsic(_InterlockedCompareExchange64)
-
 template<typename Ty>
 bool CAS2_intrinsic(_Inout_count_c_(2) node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, node<Ty> * new1, uint32_t new2)
 {
-    LONGLONG Comperand = reinterpret_cast<LONG>(old1) | (static_cast<LONGLONG>(old2) << 32);
-    LONGLONG Exchange  = reinterpret_cast<LONG>(new1) | (static_cast<LONGLONG>(new2) << 32);
+    // For x64 architectures, _InterlockedCompareExchange128 can be used, but cmpxchg16b is not
+    // supported on all AMD CPUs.
+    // http://msdn.microsoft.com/en-us/library/bb514094.aspx
+    static_assert(sizeof(old1) == sizeof(long), "CAS2_intrinsic not supported on this architecture.");
+
+    LONGLONG Comperand = reinterpret_cast<long>(old1) | (static_cast<LONGLONG>(old2) << 32);
+    LONGLONG Exchange  = reinterpret_cast<long>(new1) | (static_cast<LONGLONG>(new2) << 32);
 
     return _InterlockedCompareExchange64(reinterpret_cast<LONGLONG volatile *>(_ptr), Exchange, Comperand) == Comperand;
 }
-
 #endif  // _MSC_VER
 
 //
 // Define a version of CAS2 which uses the Windows API InterlockedCompareExchange64.
-// InterlockedCompareExchange64 requires Windows Vista
+// InterlockedCompareExchange64 requires Windows Vista.
 //
 #if WINVER >= 0x0600
-
-// LONGLONG InterlockedCompareExchange64(LONGLONG volatile * Destination, LONGLONG Exchange, LONGLONG Comperand);
 
 template<typename Ty>
 bool CAS2_windows(_Inout_count_c_(2) node<Ty> * volatile * _ptr, node<Ty> * old1, uint32_t old2, node<Ty> * new1, uint32_t new2)
 {
+    static_assert(sizeof(old1) == sizeof(long), "CAS2_windows not supported on this architecture.");
+
     LONGLONG Comperand = reinterpret_cast<long>(old1) | (static_cast<LONGLONG>(old2) << 32);
     LONGLONG Exchange  = reinterpret_cast<long>(new1) | (static_cast<LONGLONG>(new2) << 32);
 
