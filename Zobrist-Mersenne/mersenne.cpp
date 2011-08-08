@@ -25,7 +25,9 @@ static const uint32_t MT_LLMASK = Pow2Minus1<MT_R>::value;
 static const uint32_t MT_UMASK  = 0xffffffff - Pow2Minus1<MT_R>::value;
 
 // All values for the array are fine initial seed choices, except for
-// an array of all zeros.
+// an array of all zeros.  The Mersenne Twister paper states that
+// these numbers should be odd, so choose the first 624 prime numbers,
+// of which, 623 of them are odd.
 static uint32_t s_aMT[MT_N] = {
        2,    3,    5,    7,   11,   13,   17,   19,   23,   29,
       31,   37,   41,   43,   47,   53,   59,   61,   67,   71,
