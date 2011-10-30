@@ -342,7 +342,7 @@ public:
         //
         // Create all of the nodes.
         //
-        std::for_each(_apNodes.begin(), _apNodes.end(), CreateNode<Ty>);
+        std::for_each(std::begin(_apNodes), std::end(_apNodes), CreateNode<Ty>);
 
         unsigned int ii;
         for(ii = 0; ii < _aThreadData.size(); ++ii)
@@ -361,12 +361,12 @@ public:
         //
         // Wait for the threads to exit.
         //
-        std::for_each(aHandles.begin(), aHandles.end(), HandleWait);
+        std::for_each(std::begin(aHandles), std::end(aHandles), HandleWait);
 
         //
         // Delete all of the nodes.
         //
-        std::for_each(_apNodes.begin(), _apNodes.end(), DeleteNode<Ty>);
+        std::for_each(std::begin(_apNodes), std::end(_apNodes), DeleteNode<Ty>);
 
         //
         // Ideas for improvement:
@@ -456,7 +456,7 @@ public:
         //
         // Wait for the threads to exit.
         //
-        std::for_each(aHandles.begin(), aHandles.end(), HandleWait);
+        std::for_each(std::begin(aHandles), std::end(aHandles), HandleWait);
 
         //
         // Ideas for improvement:
@@ -555,12 +555,12 @@ int main()
     // Test Lock-free Queue
     //
     std::vector<node<TEST_TYPE> *> apNodes(StressQueue<TEST_TYPE, 4096>::cNodes * 4096 + 1);    // 4096 threads, and 1 extra dummy node
-    std::for_each(apNodes.begin(), apNodes.end(), CreateNode<TEST_TYPE>);
+    std::for_each(std::begin(apNodes), std::end(apNodes), CreateNode<TEST_TYPE>);
 
     StressQueue<TEST_TYPE, 4096> theQueue(apNodes);
     theQueue();
 
-    std::for_each(apNodes.begin(), apNodes.end(), DeleteNode<TEST_TYPE>);
+    std::for_each(std::begin(apNodes), std::end(apNodes), DeleteNode<TEST_TYPE>);
 
     // Demo the queue
     LockFreeQueue<MyStruct> queue(&Nodes[0]);   // Nodes[0] is dummy node
