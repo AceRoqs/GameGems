@@ -14,7 +14,7 @@ Gems books, with minor bug fixes as necessary.
 
 The Mersenne Twister code was written in a tutorial style, and is _not_
 optimized for speed. C++03 was the latest version of C++ available when this
-code was originally written.  C++0x now includes the Mersenne Twister as one
+code was originally written.  C++11 now includes the Mersenne Twister as one
 of several new random number libraries available by default.
 
 The Lock\-Free code is reasonably good, though I caution any user against

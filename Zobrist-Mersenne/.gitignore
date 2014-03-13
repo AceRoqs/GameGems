@@ -1,7 +1,0 @@
-*.sdf
-*.suo
-*.user
-*.opensdf
-Win32.*
-x64.*
-ipch/*
