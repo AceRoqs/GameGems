@@ -31,7 +31,7 @@ public:
     ~LockFreeFreeList();
     void FreeAll();
     Ty * NewInstance();
-    void FreeInstance(_In_bytecount_c_(sizeof node<Ty>) Ty * pInstance);
+    void FreeInstance(_In_ Ty * pInstance);
 };
 
 //

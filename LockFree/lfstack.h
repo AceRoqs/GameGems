@@ -18,9 +18,7 @@ class LockFreeStack
 public:
     LockFreeStack();
 
-    // The correct SAL annotation is _In_, but /analyze cannot deduce the
-    // size of node<Ty> unless it is made explicit.
-    void Push(_In_bytecount_c_(sizeof node<Ty>) node<Ty> * pNode);
+    void Push(_In_ node<Ty> * pNode);
     node<Ty> * Pop();
 };
 
