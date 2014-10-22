@@ -27,6 +27,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
+    <DefaultLanguage>en-US</DefaultLanguage>
     <ProjectGuid>{1A27C5C9-AC04-417E-B92A-6754B1544191}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ZobristMersenne</RootNamespace>
