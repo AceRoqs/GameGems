@@ -29,11 +29,6 @@ LockFreeQueue<Ty>::LockFreeQueue(_In_ node<Ty> * pDummy) : _cPops(0), _cPushes(0
     _pHead = _pTail = pDummy;
 }
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4127) // conditional expression is constant
-#endif
-
 template<typename Ty>
 void LockFreeQueue<Ty>::Add(_In_bytecount_c_(sizeof node<Ty>) node<Ty> * pNode)
 {
@@ -42,7 +37,7 @@ void LockFreeQueue<Ty>::Add(_In_bytecount_c_(sizeof node<Ty>) node<Ty> * pNode)
     uint32_t cPushes;
     node<Ty> * pTail;
 
-    while(true)
+    for(;;)
     {
         cPushes = _cPushes;
         pTail = _pTail;
@@ -75,7 +70,7 @@ node<Ty> * LockFreeQueue<Ty>::Remove()
     Ty value = Ty();
     node<Ty> * pHead;
 
-    while(true)
+    for(;;)
     {
         uint32_t cPops = _cPops;
         uint32_t cPushes = _cPushes;
@@ -116,10 +111,6 @@ node<Ty> * LockFreeQueue<Ty>::Remove()
     }
     return pHead;
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif
 

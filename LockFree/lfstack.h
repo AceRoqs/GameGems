@@ -27,15 +27,10 @@ LockFreeStack<Ty>::LockFreeStack() : _pHead(nullptr), _cPops(0)
 {
 }
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4127) // conditional expression is constant
-#endif
-
 template<typename Ty>
 void LockFreeStack<Ty>::Push(_In_bytecount_c_(sizeof node<Ty>) node<Ty> * pNode)
 {
-    while(true)
+    for(;;)
     {
         pNode->pNext = _pHead;
         if(CAS(&_pHead, pNode->pNext, pNode))
@@ -48,7 +43,7 @@ void LockFreeStack<Ty>::Push(_In_bytecount_c_(sizeof node<Ty>) node<Ty> * pNode)
 template<typename Ty>
 node<Ty> * LockFreeStack<Ty>::Pop()
 {
-    while(true)
+    for(;;)
     {
         node<Ty> * pHead = _pHead;
         uint32_t  cPops = _cPops;
@@ -68,10 +63,6 @@ node<Ty> * LockFreeStack<Ty>::Pop()
         }
     }
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif
 
