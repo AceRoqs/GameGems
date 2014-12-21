@@ -22,7 +22,7 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <ProjectGuid>{2B4A0E53-A260-40BE-A471-6565C6634F9B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Lockfree</RootNamespace>
+    <RootNamespace>LockFree</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
