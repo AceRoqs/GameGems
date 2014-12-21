@@ -24,6 +24,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PreCompile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pow2.h">
@@ -33,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zobrist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PreCompile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

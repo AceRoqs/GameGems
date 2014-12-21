@@ -1,9 +1,8 @@
 // Demonstration code for Zobrist Hash using the Mersenne Twister
-// Compiles under Visual Studio 2010 under Windows and gcc under Linux.
+// Compiles under Visual Studio 2013 under Windows and gcc under Linux.
 // By Toby Jones
 
-#include <cstdint>
-#include <iostream>
+#include "PreCompile.h"
 #include "mersenne.h"
 #include "zobrist.h"
 

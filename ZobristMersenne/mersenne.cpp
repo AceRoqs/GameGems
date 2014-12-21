@@ -1,4 +1,4 @@
-#include <cstdint>
+#include "PreCompile.h"
 #include "mersenne.h"
 #include "pow2.h"
 

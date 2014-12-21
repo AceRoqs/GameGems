@@ -1,5 +1,4 @@
-#include <cassert>
-#include <cstdint>
+#include "PreCompile.h"
 #include "zobrist.h"
 #include "mersenne.h"
 
