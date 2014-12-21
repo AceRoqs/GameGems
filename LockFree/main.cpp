@@ -5,13 +5,7 @@
 // Supports Microsoft Visual C++ and GCC.
 //
 
-#include <cassert>
-#include <cstdint>
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <windows.h>
-#include <process.h>
+#include "PreCompile.h"
 #include "lfqueue.h"
 #include "lffreelist.h"
 
