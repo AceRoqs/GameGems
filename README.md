@@ -24,7 +24,7 @@ locks. It is fun as a mental exercise, but often difficult for many
 programmers to avoid the temptation of using it in practice.
 
 As a case\-in\-point, this lock\-free queue does have a bug in
-`LockFreeQueue<T>::Add()`. The CAS between \_pTail\->pNext and NULL isn't
+`LockFreeQueue<T>::Add()`. The CAS between \_pTail\->pNext and nullptr isn't
 correct as that element isn't guaranteed to still be in the queue. I don't
 have a fix, and I can't reproduce the issue, though it has been reported on
 Xbox 360 and appears to be a bug independent of architecture.
