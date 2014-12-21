@@ -9,10 +9,6 @@
 #include "lfqueue.h"
 #include "lffreelist.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable: 4127) // conditional expression is constant
-#endif
-
 //------------------------------------------------------------------------------
 //
 // Test/Demo code for Lock-free Algorithms
@@ -26,7 +22,12 @@ struct MyStruct
 };
 
 typedef double TEST_TYPE;
-const bool FULL_TRACE = false;
+
+static /* constexpr */ bool Is_Full_Trace()
+{
+    const bool FULL_TRACE = false;
+    return FULL_TRACE;
+}
 
 //
 // Verify Assembly version of CAS.
@@ -373,7 +374,7 @@ public:
     {
         unsigned int tid = GetCurrentThreadId();
         ThreadData * ptd = reinterpret_cast<ThreadData *>(pv);
-        if(FULL_TRACE)
+        if(Is_Full_Trace())
         {
             std::cout << tid << " adding" << std::endl;
         }
@@ -384,7 +385,7 @@ public:
             ptd->pStress->_stack.Push(ptd->pStress->_apNodes[ptd->thread_num * cNodes + ii]);
         }
 
-        if(FULL_TRACE)
+        if(Is_Full_Trace())
         {
             std::cout << tid << " removing" << std::endl;
         }
@@ -463,7 +464,7 @@ public:
     {
         unsigned int tid = GetCurrentThreadId();
         ThreadData * ptd = reinterpret_cast<ThreadData *>(pv);
-        if(FULL_TRACE)
+        if(Is_Full_Trace())
         {
             std::cout << tid << " adding" << std::endl;
         }
@@ -474,7 +475,7 @@ public:
             ptd->pStress->_queue.Add(ptd->pStress->_apNodes[ptd->thread_num * cNodes + ii + 1]);
         }
 
-        if(FULL_TRACE)
+        if(Is_Full_Trace())
         {
             std::cout << tid << " removing" << std::endl;
         }
