@@ -9,10 +9,6 @@
       <UniqueIdentifier>{078f11c6-ecf9-46de-bb5d-ba70056d4ae9}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{fd33d390-298b-4a6e-835e-ab86a9c22fbb}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mersenne.cpp">
