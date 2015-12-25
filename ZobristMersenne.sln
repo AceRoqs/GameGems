@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 14.0.23107.0
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZobristMersenne", "ZobristMersenne\ZobristMersenne.vcxproj", "{1A27C5C9-AC04-417E-B92A-6754B1544191}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZobristMersenne", "..\GameGems\ZobristMersenne\ZobristMersenne.vcxproj", "{1A27C5C9-AC04-417E-B92A-6754B1544191}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
