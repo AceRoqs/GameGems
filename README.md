@@ -7,7 +7,7 @@ included in [Best of Game Programming Gems](http://amzn.to/pODKPx).
 * Lock\-Free Algorithms, first included in
 [Game Programming Gems 6](http://amzn.to/noFiJx) \(2006\).
 
-This code is targetted toward Visual C++ 2013, though it should also work with
+This code is targetted toward Visual C++ 2015, though it should also work with
 GCC. The master branch serves as the up\-to\-date version of this code. The
 gems\_bugfix branch contains the code and projects as they were written for the
 Gems books, with minor bug fixes as necessary.
