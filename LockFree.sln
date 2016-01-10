@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 14.0.23107.0
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LockFree", "..\GameGems\LockFree\LockFree.vcxproj", "{2B4A0E53-A260-40BE-A471-6565C6634F9B}"
 EndProject
