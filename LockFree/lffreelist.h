@@ -23,8 +23,8 @@ class LockFreeFreeList
     const uint32_t _cObjects;
 
     // Not implemented to prevent accidental copying.
-    LockFreeFreeList(const LockFreeFreeList&);
-    LockFreeFreeList& operator=(const LockFreeFreeList&);
+    LockFreeFreeList(const LockFreeFreeList&) = delete;
+    LockFreeFreeList& operator=(const LockFreeFreeList&) = delete;
 
 public:
     LockFreeFreeList(uint32_t cObjects);
