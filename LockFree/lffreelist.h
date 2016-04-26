@@ -53,7 +53,7 @@ LockFreeFreeList<Ty>::LockFreeFreeList(uint32_t cObjects) : _cObjects(cObjects)
 template<typename Ty>
 LockFreeFreeList<Ty>::~LockFreeFreeList()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
     for(uint32_t ix = 0; ix < _cObjects; ++ix)
     {
         assert(_Freelist.Pop() != nullptr);
