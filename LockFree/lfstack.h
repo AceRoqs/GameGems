@@ -12,20 +12,13 @@ template<typename Ty>
 class LockFreeStack
 {
     // NOTE: the order of these members is assumed by CAS2.
-    node<Ty> * volatile _pHead;
-    volatile uint32_t  _cPops;
+    node<Ty> * volatile _pHead = nullptr;
+    volatile uint32_t  _cPops = 0;
 
 public:
-    LockFreeStack();
-
     void Push(_In_ node<Ty> * pNode);
     node<Ty> * Pop();
 };
-
-template<typename Ty>
-LockFreeStack<Ty>::LockFreeStack() : _pHead(nullptr), _cPops(0)
-{
-}
 
 template<typename Ty>
 void LockFreeStack<Ty>::Push(_In_bytecount_c_(sizeof node<Ty>) node<Ty> * pNode)

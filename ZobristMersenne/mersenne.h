@@ -3,7 +3,7 @@
 
 class MersenneTwister
 {
-    int m_ix;
+    int m_ix = 0;
 
     void Regenerate();
 

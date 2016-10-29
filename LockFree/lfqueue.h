@@ -12,9 +12,9 @@ template<typename Ty>
 class LockFreeQueue {
     // NOTE: the order of these members is assumed by CAS2.
     node<Ty> * volatile _pHead;
-    volatile uint32_t  _cPops;
+    volatile uint32_t  _cPops = 0;
     node<Ty> * volatile _pTail;
-    volatile uint32_t  _cPushes;
+    volatile uint32_t  _cPushes = 0;
 
 public:
     LockFreeQueue(_In_ node<Ty> * pDummy);
@@ -24,7 +24,7 @@ public:
 };
 
 template<typename Ty>
-LockFreeQueue<Ty>::LockFreeQueue(_In_ node<Ty> * pDummy) : _cPops(0), _cPushes(0)
+LockFreeQueue<Ty>::LockFreeQueue(_In_ node<Ty> * pDummy)
 {
     _pHead = _pTail = pDummy;
 }

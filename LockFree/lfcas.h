@@ -41,10 +41,10 @@ template<typename Ty>
 struct node
 {
     Ty value;
-    node<Ty> * volatile pNext;
+    node<Ty> * volatile pNext = nullptr;
 
-    node() : value(), pNext(nullptr) {}
-    node(Ty v) : pNext(nullptr), value(v) {}
+    node() : value() {}
+    node(Ty v) : value(v) {}
 };
 
 // CAS will assume a multi-processor machine (versus multithread on a single processor).

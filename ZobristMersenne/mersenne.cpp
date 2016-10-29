@@ -105,8 +105,7 @@ void MersenneTwister::Regenerate()
     }
 }
 
-MersenneTwister::MersenneTwister() :
-    m_ix(0)
+MersenneTwister::MersenneTwister()
 {
     // s_aMT is already initialized with the first N primes.
     Regenerate();

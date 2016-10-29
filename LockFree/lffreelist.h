@@ -22,13 +22,15 @@ class LockFreeFreeList
     node<Ty> * _pObjects;
     const uint32_t _cObjects;
 
-    // Not implemented to prevent accidental copying.
+    // Not implemented to prevent accidental copying/moving.
     LockFreeFreeList(const LockFreeFreeList&) = delete;
+    LockFreeFreeList(LockFreeFreeList&&) noexcept = delete;
     LockFreeFreeList& operator=(const LockFreeFreeList&) = delete;
+    LockFreeFreeList& operator=(LockFreeFreeList&&) noexcept = delete;
 
 public:
     LockFreeFreeList(uint32_t cObjects);
-    ~LockFreeFreeList();
+    ~LockFreeFreeList() noexcept;
     void FreeAll();
     Ty * NewInstance();
     void FreeInstance(_In_ Ty * pInstance);
